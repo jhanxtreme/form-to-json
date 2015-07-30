@@ -3,6 +3,19 @@ Author: Jhan Mateo
 Date Started: 7/29/2015
 Date Ended: 7/30/2015
 Description: Using native javascript (no js framework), this application will serializes from form data to Json format.
+The MIT License (MIT)
+
+Copyright (c) 2015 Jhan Mateo
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software 
+is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
 **/
 
 'use strict';
@@ -17,6 +30,7 @@ function formToJson(form){
 	var json_data = {}, new_arr_obj=null, index=null, key=null, input_name=null, new_obj=null;
 
 	for(var i=0,n=form.length; i<n; i++){
+
 		if(form[i].type!=='submit' || form[i].nodeName.toLowerCase()!=='fieldset' || form[i].nodeName.toLowerCase()!=='reset'){
 			
 			if(
@@ -26,6 +40,7 @@ function formToJson(form){
 				(form[i].type==='text' && form[i].value.length>0) ||
 				(form[i].type==='range' && form[i].value.length>0) ||
 				(form[i].type==='select-one' && form[i].options[form[i].selectedIndex].value.length>0) ||
+				(form[i].type==='select-multiple' && form[i].selectedOptions.length>0) ||
 				(form[i].type==='textarea' && form[i].value.length>0) ||
 				(form[i].type==='number' && form[i].value.length>0) ||
 				(form[i].type==='date' && form[i].value.length>0) ||
@@ -42,10 +57,11 @@ function formToJson(form){
 				(form[i].type==='image' && form[i].value.length>0) ||
 				(form[i].type==='file' && form[i].value.length>0)
 			){
+
 				/*get the name of the current input*/
 				input_name = form[i].name;
 				
-					/*array/object*/
+				/*array/object*/
 				if(input_name.match(/\[.*\]/g)){
 
 					if(input_name.match(/\[.+\]/g)){
@@ -87,12 +103,27 @@ function formToJson(form){
 							json_data[new_obj][key] = form[i].value;
 						}else{}
 					}else{		
+
 						/*to array, Object[]*/
 						key = input_name.replace(/\[.*\]/g, '');
-						if(typeof json_data[key]==='undefined'){
-							json_data[key] = [];
+
+						if(form[i].type==='select-multiple'){
+							for(var j=0, m=form[i].selectedOptions.length; j<m; j++){
+								if(form[i].selectedOptions[j].value.length>0){
+									if(typeof json_data[key]==='undefined'){
+										json_data[key] = [];
+									}
+									json_data[key].push(form[i].selectedOptions[j].value);
+								}
+							}
+							
+						}else{
+							if(typeof json_data[key]==='undefined'){
+								json_data[key] = [];
+							}
+							json_data[key].push(form[i].value);
 						}
-						json_data[key].push(form[i].value);
+						
 					}	
 				}else{
 					/*basic info*/

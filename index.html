@@ -90,6 +90,17 @@
 	</fieldset>
 
 	<fieldset>
+		<legend>Select - Multiple</legend>
+		Are you human?
+		<select name="survey_multiple[]" multiple="multiple">
+			<option value="">Select</option>
+			<option value="yes">YES</option>
+			<option value="no">NO</option>
+			<option value="maybe">MAYBE</option>
+		</select>
+	</fieldset>
+
+	<fieldset>
 		<legend>Radio</legend>
 		Gender
 		<input type="radio" name="gender" value="M" />Male
@@ -125,7 +136,7 @@
 
 	<fieldset>
 		<legend>Range</legend>
-		<input type="range" name="range" value="50" />
+		<input type="range" name="range" value="50" max="100" />
 	</fieldset>
 
 	<fieldset>
