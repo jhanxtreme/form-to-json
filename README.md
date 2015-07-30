@@ -3,9 +3,9 @@ Serializes form data to json data.
 
 # Usage
 
-<form onsubmit="return formToJson(this)">
-	//form elements goes here
-</form>
+	<form onsubmit="return formToJson(this)">
+		//form elements goes here
+	</form>
 
 
 # Sample JSON output
