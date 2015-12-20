@@ -38,6 +38,7 @@ function formToJson (form) {
 
 		if (
           form[i].type !== 'submit' ||
+          form[i].type !== 'button' ||
           form[i].nodeName.toLowerCase() !== 'fieldset' ||
           form[i].nodeName.toLowerCase() !== 'reset'
         ) {
@@ -144,8 +145,9 @@ function formToJson (form) {
 		}
 	}
 
-	document.getElementById('json_result').innerHTML = JSON.stringify(json_data);
-	console.log('Result: ', json_data);
-	console.log('Result: ', json_data);
-	return false;
+    if (document.getElementById('json_result') !== null) { 
+        document.getElementById('json_result').innerHTML = JSON.stringify(json_data);
+    }
+  
+    return json_data;
 }
