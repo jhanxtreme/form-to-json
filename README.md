@@ -6,6 +6,14 @@ Serializes form data to json data.
 	<form onsubmit="return formToJson(this)">
 		//form elements goes here
 	</form>
+    
+## Settings
+
+    formToJson(this, {
+        returnData: true, // return the data at the end
+        printDataIn: false, // selector where json should be printed
+        minValueLength: 0 // select only inputs with at least x characters
+    })
 
 
 # Sample JSON output
