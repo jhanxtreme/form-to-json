@@ -20,122 +20,147 @@ all copies or substantial portions of the Software.
 
 'use strict';
 
-function formToJson(form){
+function formToJson (form, sett) {
+  
+    var defaults = {
+        returnData: false, // return the data at the end
+        printDataIn: '#json_result', // selector where json should be printed
+        minValueLength: 1 // select only inputs with at least x characters
+    }
+    
+    var settings = Object.assign(defaults, sett);
 
-	if('form'!==form.nodeName.toLowerCase() && 1!==form.nodeType){
+	if ('form' !== form.nodeName.toLowerCase() && 1 !== form.nodeType) {
 		console.log('Form error');
 		return false;
 	}
 
-	var json_data = {}, new_arr_obj=null, index=null, key=null, input_name=null, new_obj=null;
+	var jsonData = {};
+    var newArrObj;
+    var index;
+    var key;
+    var inputName;
+    var newObj;
 
-	for(var i=0,n=form.length; i<n; i++){
+	for (var i = 0; i < form.length; i++) {
 
-		if(form[i].type!=='submit' || form[i].nodeName.toLowerCase()!=='fieldset' || form[i].nodeName.toLowerCase()!=='reset'){
-			
-			if(
-				(form[i]!==undefined && form[i]!==null) &&
-				(form[i].type==='checkbox' && form[i].checked) ||
-				(form[i].type==='radio' && form[i].checked) ||
-				(form[i].type==='text' && form[i].value.length>0) ||
-				(form[i].type==='range' && form[i].value.length>0) ||
-				(form[i].type==='select-one' && form[i].options[form[i].selectedIndex].value.length>0) ||
-				(form[i].type==='select-multiple' && form[i].selectedOptions.length>0) ||
-				(form[i].type==='textarea' && form[i].value.length>0) ||
-				(form[i].type==='number' && form[i].value.length>0) ||
-				(form[i].type==='date' && form[i].value.length>0) ||
-				(form[i].type==='color' && form[i].value.length>0) ||
-				(form[i].type==='month' && form[i].value.length>0) ||
-				(form[i].type==='week' && form[i].value.length>0) ||
-				(form[i].type==='time' && form[i].value.length>0) ||
-				(form[i].type==='datetime' && form[i].value.length>0) ||
-				(form[i].type==='datetime-local' && form[i].value.length>0) ||
-				(form[i].type==='email' && form[i].value.length>0) ||
-				(form[i].type==='search' && form[i].value.length>0) ||
-				(form[i].type==='tel' && form[i].value.length>0) ||
-				(form[i].type==='url' && form[i].value.length>0) ||
-				(form[i].type==='image' && form[i].value.length>0) ||
-				(form[i].type==='file' && form[i].value.length>0)
-			){
+		if (
+          form[i].type !== 'submit' ||
+          form[i].type !== 'button' ||
+          form[i].nodeName.toLowerCase() !== 'fieldset' ||
+          form[i].nodeName.toLowerCase() !== 'reset'
+        ) {
+		    var longEnough = form[i].value.length >= settings.minValueLength;
+          
+			if (
+				(form[i] !== undefined && form[i] !== null) &&
+				(form[i].type === 'checkbox' && form[i].checked) ||
+				(form[i].type === 'radio' && form[i].checked) ||
+				(form[i].type === 'text' && longEnough) ||
+				(form[i].type === 'range' && longEnough) ||
+				(form[i].type === 'select-one' && form[i].options[form[i].selectedIndex].value.length >= settings.minValueLength) ||
+				(form[i].type === 'select-multiple' && form[i].selectedOptions.length >= settings.minValueLength) ||
+				(form[i].type === 'textarea' && longEnough) ||
+				(form[i].type === 'number' && longEnough) ||
+				(form[i].type === 'date' && longEnough) ||
+				(form[i].type === 'color' && longEnough) ||
+				(form[i].type === 'month' && longEnough) ||
+				(form[i].type === 'week' && longEnough) ||
+				(form[i].type === 'time' && longEnough) ||
+				(form[i].type === 'datetime' && longEnough) ||
+				(form[i].type === 'datetime-local' && longEnough) ||
+				(form[i].type === 'email' && longEnough) ||
+				(form[i].type === 'search' && longEnough) ||
+				(form[i].type === 'tel' && longEnough) ||
+				(form[i].type === 'url' && longEnough) ||
+				(form[i].type === 'image' && longEnough) ||
+				(form[i].type === 'file' && longEnough)
+			) {
 
-				/*get the name of the current input*/
-				input_name = form[i].name;
+				// get the name of the current input
+				inputName = form[i].name;
 				
-				/*array/object*/
-				if(input_name.match(/\[.*\]/g)){
+				// array/object
+				if (inputName.match(/\[.*\]/g)) {
 
-					if(input_name.match(/\[.+\]/g)){
+					if (inputName.match(/\[.+\]/g)) {
 
-						/*array object,  Object[][name]*/
-						if(input_name.match(/\[.+\]/g)[0].match(/\[[0-9]\]/)!==null){
+						// array object,  Object[][name]
+						if (inputName.match(/\[.+\]/g)[0].match(/\[[0-9]\]/) !== null) {
 
-							new_arr_obj = input_name.replace(/\[.+\]/g,''); //get object name
-							index = input_name.match(/[0-9]/g)[0]; //get index group
-							key = input_name.match(/\[.+\]/g)[0].replace(/(\[|\]|[0-9])/g,'');
+							newArrObj = inputName.replace(/\[.+\]/g,''); // get object name
+							index = inputName.match(/[0-9]/g)[0]; // get index group
+							key = inputName.match(/\[.+\]/g)[0].replace(/(\[|\]|[0-9])/g,'');
 						
-							/*create an array in an object*/
-							if(typeof json_data[new_arr_obj]==='undefined'){
-							 	json_data[new_arr_obj] = [];
+							// create an array in an object
+							if (typeof jsonData[newArrObj] === 'undefined') {
+							 	jsonData[newArrObj] = [];
 							}
 
-							/*create an object inside array*/
-							if(typeof json_data[new_arr_obj][index]==='undefined'){
-								json_data[new_arr_obj][index] = {};
+							// create an object inside array
+							if (typeof jsonData[newArrObj][index] === 'undefined') {
+								jsonData[newArrObj][index] = {};
 							}
 
-							json_data[new_arr_obj][index][key] = form[i].value;
+							jsonData[newArrObj][index][key] = form[i].value;
 
-						}else if(input_name.match(/\[.+\]/g)!==null){
-							//to object
-							//Object[name]
+						} else if (inputName.match(/\[.+\]/g) !== null) {
+							// to object
+							// Object[name]
 
-							/*get object name*/
-							new_obj = input_name.replace(/\[.+\]/g,'');
+							// get object name
+							newObj = inputName.replace(/\[.+\]/g,'');
 
-							/*set new object*/
-							if(typeof json_data[new_obj]==='undefined'){
-								json_data[new_obj] = {};
+							// set new object
+							if (typeof jsonData[newObj] === 'undefined') {
+								jsonData[newObj] = {};
 							}
-							/*assign a key name*/
-							key = input_name.match(/\[.+\]/g)[0].replace(/(\[|\])/g,'');
+							// assign a key name
+							key = inputName.match(/\[.+\]/g)[0].replace(/(\[|\])/g,'');
 
-							/*set key and form value*/
-							json_data[new_obj][key] = form[i].value;
-						}else{}
-					}else{		
+							// set key and form value
+							jsonData[newObj][key] = form[i].value;
+						}
+					} else {		
 
-						/*to array, Object[]*/
-						key = input_name.replace(/\[.*\]/g, '');
+						// to array, Object[]
+						key = inputName.replace(/\[.*\]/g, '');
 
-						if(form[i].type==='select-multiple'){
-							for(var j=0, m=form[i].selectedOptions.length; j<m; j++){
-								if(form[i].selectedOptions[j].value.length>0){
-									if(typeof json_data[key]==='undefined'){
-										json_data[key] = [];
+						if (form[i].type === 'select-multiple') {
+							for (var j = 0; j < form[i].selectedOptions.length; j++) {
+								if (form[i].selectedOptions[j].value.length > 0) {
+									if (typeof jsonData[key] === 'undefined') {
+										jsonData[key] = [];
 									}
-									json_data[key].push(form[i].selectedOptions[j].value);
+									jsonData[key].push(form[i].selectedOptions[j].value);
 								}
 							}
 							
-						}else{
-							if(typeof json_data[key]==='undefined'){
-								json_data[key] = [];
+						} else {
+							if (typeof jsonData[key] === 'undefined') {
+								jsonData[key] = [];
 							}
-							json_data[key].push(form[i].value);
+							jsonData[key].push(form[i].value);
 						}
 						
 					}	
-				}else{
-					/*basic info*/
+				} else {
+					// basic info
 					key = form[i].name.replace(/\[.*\]/g, '');
-					json_data[key] = form[i].value;
+					jsonData[key] = form[i].value;
 
 				}
 			}
 		}
-	}//endfor
+	}
 
-	document.getElementById('json_result').innerHTML = JSON.stringify(json_data);
-	console.log("Result: ",json_data);
-	return false;
-}//endfunc
+    if (document.querySelector(settings.printDataIn) !== null) { 
+        document.querySelector(settings.printDataIn).innerHTML = JSON.stringify(jsonData);
+    }
+  
+    if (settings.returnData) {
+      return jsonData;
+    }
+    
+    return false;
+}
